@@ -52,6 +52,9 @@ int main()
   glfwSetCursorPosCallback(window, mouse_callback);
   glfwSetScrollCallback(window, scroll_callback);
 
+  // tell GLFW to capture our mouse
+  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
   // glad: load all OpenGL function pointers
   // ---------------------------------------
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -117,6 +120,13 @@ int main()
   }
   stbi_image_free(data);
 
+  // tell stb_image.h to flip loaded texture's on the y-axis (before loading model).
+  stbi_set_flip_vertically_on_load(true);
+
+  // configure global opengl state
+  // -----------------------------
+  glEnable(GL_DEPTH_TEST);
+
   // Vertex shader
   Shader myShader("/home/pank/Documents/7o_eks/graphics/erg/dev/src/hello.vs",
                   "/home/pank/Documents/7o_eks/graphics/erg/dev/src/hello.fs");
@@ -124,12 +134,18 @@ int main()
   myShader.use();
   myShader.setInt("texture1", 0);
 
+  Model myModel("/home/pank/Documents/7o_eks/graphics/erg/dev/misc/planet/planet.obj");
+  Model myModel2("/home/pank/Documents/7o_eks/graphics/erg/dev/misc/rock/rock.obj");
+
   // render loop
   // -----------
   while (!glfwWindowShouldClose(window))
   {
     // per-frame time logic
     // --------------------
+    float currentFrame = static_cast<float>(glfwGetTime());
+    deltaTime = currentFrame - lastFrame;
+    lastFrame = currentFrame;
 
     // input
     // -----
@@ -137,17 +153,33 @@ int main()
 
     // render
     // ------
-    glClearColor(0.0f, 0.3f, 0.3f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // bind textures on corresponding texture units
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture);
 
     // render the triangle
-    // myShader.use();
-    // glBindVertexArray(VAO);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+    myShader.use();
+
+    // view/projection transformations
+    glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+    glm::mat4 view = camera.GetViewMatrix();
+    myShader.setMat4("projection", projection);
+    myShader.setMat4("view", view);
+
+    // render the loaded model
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(0.0f, 0.0f, -13.0f)); // translate it down so it's at the center of the scene
+    model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));       // it's a bit too big for our scene, so scale it down
+    myShader.setMat4("model", model);
+    myModel.Draw(myShader);
+    glm::mat4 model2 = glm::mat4(1.0f);
+    model2 = glm::translate(model2, glm::vec3(-4.0f, 0.0f, -8.0f)); // translate it down so it's at the center of the scene
+    model2 = glm::scale(model2, glm::vec3(1.0f, 1.0f, 1.0f));       // it's a bit too big for our scene, so scale it down
+    myShader.setMat4("model", model2);
+    myModel2.Draw(myShader);
 
     // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved
     // etc.)
