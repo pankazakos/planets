@@ -64,7 +64,7 @@ int main()
   }
 
   // tell stb_image.h to flip loaded texture's on the y-axis (before loading model).
-  stbi_set_flip_vertically_on_load(true);
+  // stbi_set_flip_vertically_on_load(true);
 
   // configure global opengl state
   // -----------------------------
@@ -79,6 +79,7 @@ int main()
 
   Model myModel("/home/pank/Documents/7o_eks/graphics/erg/dev/misc/planet/planet.obj");
   Model myModel2("/home/pank/Documents/7o_eks/graphics/erg/dev/misc/rock/rock.obj");
+  Model myModel3("/home/pank/Documents/7o_eks/graphics/erg/dev/misc/earth/Model/Globe.obj");
 
   // render loop
   // -----------
@@ -96,7 +97,7 @@ int main()
 
     // render
     // ------
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClearColor(0.01f, 0.01f, 0.01f, 1.0f); // light grey background
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // render the triangle
@@ -110,15 +111,22 @@ int main()
 
     // render the loaded model
     glm::mat4 model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(0.0f, 0.0f, -13.0f)); // translate it down so it's at the center of the scene
-    model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));       // it's a bit too big for our scene, so scale it down
+    model = glm::translate(model, glm::vec3(-8.0f, 0.0f, -40.0f)); // translate it down so it's at the center of the scene
+    model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));        // it's a bit too big for our scene, so scale it down
     myShader.setMat4("model", model);
     myModel.Draw(myShader);
+
     glm::mat4 model2 = glm::mat4(1.0f);
-    model2 = glm::translate(model2, glm::vec3(-4.0f, 0.0f, -8.0f)); // translate it down so it's at the center of the scene
+    model2 = glm::translate(model2, glm::vec3(2.0f, 0.0f, -18.0f)); // translate it down so it's at the center of the scene
     model2 = glm::scale(model2, glm::vec3(1.0f, 1.0f, 1.0f));       // it's a bit too big for our scene, so scale it down
     myShader.setMat4("model", model2);
     myModel2.Draw(myShader);
+
+    glm::mat4 model3 = glm::mat4(1.0f);
+    model3 = glm::translate(model3, glm::vec3(15.0f, 0.0f, -25.0f)); // translate it down so it's at the center of the scene
+    model3 = glm::scale(model3, glm::vec3(1.0f, 1.0f, 1.0f));        // it's a bit too big for our scene, so scale it down
+    myShader.setMat4("model", model3);
+    myModel3.Draw(myShader);
 
     // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved
     // etc.)
