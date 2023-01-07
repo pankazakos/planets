@@ -1,0 +1,25 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build and run",
+      "command": "make run",
+      "type": "shell",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always"
+      },
+      "group": "build"
+    },
+    {
+      "label": "run",
+      "command": "./bin/hellowindow",
+      "type": "shell",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always"
+      },
+      "group": "test"
+    }
+  ]
+}
