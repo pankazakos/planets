@@ -28,6 +28,9 @@ bool firstMouse = true;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
+// control space key
+bool begin_movement = false;
+
 int main()
 {
   // glfw: initialize and configure
@@ -71,15 +74,15 @@ int main()
   glEnable(GL_DEPTH_TEST);
 
   // Vertex shader
-  Shader myShader("/home/pank/Documents/7o_eks/graphics/erg/dev/src/hello.vs",
-                  "/home/pank/Documents/7o_eks/graphics/erg/dev/src/hello.fs");
+  Shader PlanetShader("/home/pank/Documents/7o_eks/graphics/erg/dev/src/planets.vs",
+                      "/home/pank/Documents/7o_eks/graphics/erg/dev/src/planets.fs");
 
-  myShader.use();
-  myShader.setInt("texture1", 0);
+  PlanetShader.use();
+  PlanetShader.setInt("texture1", 0);
 
-  Model myModel("/home/pank/Documents/7o_eks/graphics/erg/dev/misc/planet/planet.obj");
-  Model myModel2("/home/pank/Documents/7o_eks/graphics/erg/dev/misc/rock/rock.obj");
-  Model myModel3("/home/pank/Documents/7o_eks/graphics/erg/dev/misc/earth/Model/Globe.obj");
+  Model sun("/home/pank/Documents/7o_eks/graphics/erg/dev/misc/planet/planet.obj");
+  Model moon("/home/pank/Documents/7o_eks/graphics/erg/dev/misc/rock/rock.obj");
+  Model earth("/home/pank/Documents/7o_eks/graphics/erg/dev/misc/earth/Model/Globe.obj");
 
   // render loop
   // -----------
@@ -101,32 +104,39 @@ int main()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // render the triangle
-    myShader.use();
+    PlanetShader.use();
 
     // view/projection transformations
     glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
     glm::mat4 view = camera.GetViewMatrix();
-    myShader.setMat4("projection", projection);
-    myShader.setMat4("view", view);
+    PlanetShader.setMat4("projection", projection);
+    PlanetShader.setMat4("view", view);
 
-    // render the loaded model
-    glm::mat4 model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(-8.0f, 0.0f, -40.0f)); // translate it down so it's at the center of the scene
-    model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));        // it's a bit too big for our scene, so scale it down
-    myShader.setMat4("model", model);
-    myModel.Draw(myShader);
+    // render the loaded models
 
+    // Sun
+    glm::mat4 model1 = glm::mat4(1.0f);
+    model1 = glm::translate(model1, glm::vec3(-8.0f, 0.0f, -40.0f));
+    PlanetShader.setMat4("model", model1);
+    sun.Draw(PlanetShader);
+
+    // Moon
     glm::mat4 model2 = glm::mat4(1.0f);
-    model2 = glm::translate(model2, glm::vec3(2.0f, 0.0f, -18.0f)); // translate it down so it's at the center of the scene
-    model2 = glm::scale(model2, glm::vec3(1.0f, 1.0f, 1.0f));       // it's a bit too big for our scene, so scale it down
-    myShader.setMat4("model", model2);
-    myModel2.Draw(myShader);
+    model2 = glm::translate(model2, glm::vec3(2.0f, 0.0f, -18.0f));
+    PlanetShader.setMat4("model", model2);
+    moon.Draw(PlanetShader);
 
+    // Earth
     glm::mat4 model3 = glm::mat4(1.0f);
-    model3 = glm::translate(model3, glm::vec3(15.0f, 0.0f, -25.0f)); // translate it down so it's at the center of the scene
-    model3 = glm::scale(model3, glm::vec3(1.0f, 1.0f, 1.0f));        // it's a bit too big for our scene, so scale it down
-    myShader.setMat4("model", model3);
-    myModel3.Draw(myShader);
+    model3 = glm::translate(model3, glm::vec3(15.0f, 0.0f, -25.0f));
+    PlanetShader.setMat4("model", model3);
+    earth.Draw(PlanetShader);
+
+    // Control movement
+    if (begin_movement)
+    {
+      std::cout << "begin" << std::endl;
+    }
 
     // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved
     // etc.)
@@ -198,5 +208,6 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
   if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
   {
     std::cout << "You pressed space" << std::endl;
+    begin_movement = !begin_movement;
   }
 }

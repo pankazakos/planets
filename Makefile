@@ -6,7 +6,7 @@ SRC = ./src
 PROGRAM_PATH = $(SRC)
 FLAGS = -Wall
 
-NAME = hellowindow
+NAME = planets
 
 all:
 	g++ $(PROGRAM_PATH)/$(NAME).cpp $(GLAD) -o $(BIN)/$(NAME) $(LIBS) -I $(INCLUDE) $(FLAGS)
