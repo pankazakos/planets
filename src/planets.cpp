@@ -139,6 +139,8 @@ int main()
     PlanetShader.use();
     PlanetShader.setMat4("projection", projection);
     PlanetShader.setMat4("view", view);
+    PlanetShader.setVec3("lightPos", sun_init_pos);
+    PlanetShader.setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
 
     // Moon
     glm::mat4 model2 = glm::mat4(1.0f);
