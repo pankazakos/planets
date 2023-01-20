@@ -15,8 +15,8 @@ void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);
 void processInput(GLFWwindow *window);
 // settings
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
+const unsigned int SCR_WIDTH = 1280;
+const unsigned int SCR_HEIGHT = 720;
 
 // camera
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
@@ -30,7 +30,6 @@ float lastFrame = 0.0f;
 
 // control space key
 bool begin_movement = false;
-float angle = 0.0f;
 
 int main()
 {
@@ -86,13 +85,15 @@ int main()
   Model earth("/home/pank/Documents/7o_eks/graphics/erg/dev/misc/earth/Model/Globe.obj");
 
   // Initial positions of planets based on camera
-  glm::vec3 sun_init_pos = glm::vec3(-8.0f, 0.0f, -40.0f);
-  glm::vec3 moon_init_pos = glm::vec3(2.0f, 0.0f, -18.0f);
-  glm::vec3 earth_init_pos = glm::vec3(15.0f, 0.0f, -25.0f);
+  glm::vec3 sun_init_pos = glm::vec3(-8.0f, 0.0f, -60.0f);
+  glm::vec3 moon_init_pos = glm::vec3(20.0f, 0.0f, 0.0f);
+  glm::vec3 earth_init_pos = glm::vec3(30.0f, 0.0f, 0.0f);
 
   glm::vec3 sun_pos = sun_init_pos;
   glm::vec3 moon_pos = moon_init_pos;
   glm::vec3 earth_pos = earth_init_pos;
+
+  float angle = 0.0f;
 
   // render loop
   // -----------
@@ -124,26 +125,32 @@ int main()
 
     // render the loaded models
 
-    // Control movement
-    if (begin_movement)
-    {
-      angle += 0.01f;
-    }
-
     // Sun
     glm::mat4 model1 = glm::mat4(1.0f);
     model1 = glm::translate(model1, sun_pos);
 
     // Moon
     glm::mat4 model2 = glm::mat4(1.0f);
-    model2 = glm::translate(model2, moon_pos);
 
     // Earth
     glm::mat4 model3 = glm::mat4(1.0f);
-    model3 = glm::translate(model3, earth_pos);
+
+    // Control movement
+    if (begin_movement)
+    {
+      angle += 0.001f;
+      earth_pos = glm::vec3(30.0f * glm::cos(5 * angle), 0.0f, -30.0f * glm::sin(5 * angle));
+      moon_pos = glm::vec3(20.0f * glm::cos(angle), 0.0f, -20.0f * -glm::sin(angle));
+    }
+
+    // Earth positioning
+    model3 = glm::translate(model1, earth_pos);
 
     // Apply rotation for earth
-    model3 = glm::rotate(model3, angle, glm::vec3(0.0f, 1.0f, 0.0f));
+    model3 = glm::rotate(model3, 30 * angle, glm::vec3(0.0f, 1.0f, 0.0f));
+
+    // Moon positioning
+    model2 = glm::translate(model3, moon_pos);
 
     // Draw objects after all transformations
     PlanetShader.setMat4("model", model1);
