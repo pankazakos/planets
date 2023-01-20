@@ -2,7 +2,7 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <iostream>
-#include "shader_t.h"
+#include "shader.h"
 #include "camera.h"
 #include "model.h"
 
@@ -77,8 +77,14 @@ int main()
   Shader PlanetShader("/home/pank/Documents/7o_eks/graphics/erg/dev/src/planets.vs",
                       "/home/pank/Documents/7o_eks/graphics/erg/dev/src/planets.fs");
 
+  Shader LightingShader("/home/pank/Documents/7o_eks/graphics/erg/dev/src/planets.vs",
+                        "/home/pank/Documents/7o_eks/graphics/erg/dev/src/lighting.fs");
+
   PlanetShader.use();
-  PlanetShader.setInt("texture1", 0);
+  PlanetShader.setInt("texture0", 0);
+
+  LightingShader.use();
+  LightingShader.setInt("texture1", 1);
 
   Model sun("/home/pank/Documents/7o_eks/graphics/erg/dev/misc/planet/planet.obj");
   Model moon("/home/pank/Documents/7o_eks/graphics/erg/dev/misc/rock/rock.obj");
@@ -115,13 +121,15 @@ int main()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // render
-    PlanetShader.use();
 
     // view/projection transformations
     glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
     glm::mat4 view = camera.GetViewMatrix();
     PlanetShader.setMat4("projection", projection);
     PlanetShader.setMat4("view", view);
+
+    LightingShader.setMat4("projection", projection);
+    LightingShader.setMat4("view", view);
 
     // render the loaded models
 
@@ -153,13 +161,16 @@ int main()
     model2 = glm::translate(model3, moon_pos);
 
     // Draw objects after all transformations
-    PlanetShader.setMat4("model", model1);
-    sun.Draw(PlanetShader);
+    LightingShader.setMat4("model", model1);
+    LightingShader.setVec4("color", glm::vec4(1.8f, 1.5f, 1.0f, 1.0f));
+    sun.Draw(LightingShader);
 
     PlanetShader.setMat4("model", model2);
+    PlanetShader.setVec4("color", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
     moon.Draw(PlanetShader);
 
     PlanetShader.setMat4("model", model3);
+    PlanetShader.setVec4("color", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
     earth.Draw(PlanetShader);
 
     // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved
@@ -227,6 +238,7 @@ void scroll_callback(GLFWwindow *window, double xoffset, double yoffset)
   camera.ProcessMouseScroll(static_cast<float>(yoffset));
 }
 
+// glfw: whenever a key is pressed, this callback is called to control the spcae key activation
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
   if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
