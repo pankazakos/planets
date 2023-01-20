@@ -113,7 +113,7 @@ int main()
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // black background
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // render the triangle
+    // render
     PlanetShader.use();
 
     // view/projection transformations
@@ -124,33 +124,37 @@ int main()
 
     // render the loaded models
 
+    // Control movement
+    if (begin_movement)
+    {
+      angle += 0.01f;
+    }
+
     // Sun
     glm::mat4 model1 = glm::mat4(1.0f);
     model1 = glm::translate(model1, sun_pos);
-    PlanetShader.setMat4("model", model1);
-    sun.Draw(PlanetShader);
 
     // Moon
     glm::mat4 model2 = glm::mat4(1.0f);
     model2 = glm::translate(model2, moon_pos);
-    PlanetShader.setMat4("model", model2);
-    moon.Draw(PlanetShader);
 
     // Earth
     glm::mat4 model3 = glm::mat4(1.0f);
     model3 = glm::translate(model3, earth_pos);
+
+    // Apply rotation for earth
+    model3 = glm::rotate(model3, angle, glm::vec3(0.0f, 1.0f, 0.0f));
+
+    // Draw objects after all transformations
+    PlanetShader.setMat4("model", model1);
+    sun.Draw(PlanetShader);
+
+    PlanetShader.setMat4("model", model2);
+    moon.Draw(PlanetShader);
+
     PlanetShader.setMat4("model", model3);
-
-    // Control movement
-    if (begin_movement)
-    {
-      model3 = glm::translate(model2, glm::vec3(-40.0f, 0.0f, 0.0f));
-      model3 = glm::rotate(model3, angle, glm::vec3(0.0f, 1.0f, 0.0f));
-      PlanetShader.setMat4("model", model3);
-      angle += 0.01f;
-    }
-
     earth.Draw(PlanetShader);
+
     // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved
     // etc.)
     // -------------------------------------------------------------------------------
