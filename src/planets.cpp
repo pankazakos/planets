@@ -30,6 +30,7 @@ float lastFrame = 0.0f;
 
 // control space key
 bool begin_movement = false;
+float angle = 0.0f;
 
 int main()
 {
@@ -84,6 +85,15 @@ int main()
   Model moon("/home/pank/Documents/7o_eks/graphics/erg/dev/misc/rock/rock.obj");
   Model earth("/home/pank/Documents/7o_eks/graphics/erg/dev/misc/earth/Model/Globe.obj");
 
+  // Initial positions of planets based on camera
+  glm::vec3 sun_init_pos = glm::vec3(-8.0f, 0.0f, -40.0f);
+  glm::vec3 moon_init_pos = glm::vec3(2.0f, 0.0f, -18.0f);
+  glm::vec3 earth_init_pos = glm::vec3(15.0f, 0.0f, -25.0f);
+
+  glm::vec3 sun_pos = sun_init_pos;
+  glm::vec3 moon_pos = moon_init_pos;
+  glm::vec3 earth_pos = earth_init_pos;
+
   // render loop
   // -----------
   while (!glfwWindowShouldClose(window))
@@ -100,7 +110,7 @@ int main()
 
     // render
     // ------
-    glClearColor(0.01f, 0.01f, 0.01f, 1.0f); // light grey background
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // black background
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // render the triangle
@@ -116,28 +126,31 @@ int main()
 
     // Sun
     glm::mat4 model1 = glm::mat4(1.0f);
-    model1 = glm::translate(model1, glm::vec3(-8.0f, 0.0f, -40.0f));
+    model1 = glm::translate(model1, sun_pos);
     PlanetShader.setMat4("model", model1);
     sun.Draw(PlanetShader);
 
     // Moon
     glm::mat4 model2 = glm::mat4(1.0f);
-    model2 = glm::translate(model2, glm::vec3(2.0f, 0.0f, -18.0f));
+    model2 = glm::translate(model2, moon_pos);
     PlanetShader.setMat4("model", model2);
     moon.Draw(PlanetShader);
 
     // Earth
     glm::mat4 model3 = glm::mat4(1.0f);
-    model3 = glm::translate(model3, glm::vec3(15.0f, 0.0f, -25.0f));
+    model3 = glm::translate(model3, earth_pos);
     PlanetShader.setMat4("model", model3);
-    earth.Draw(PlanetShader);
 
     // Control movement
     if (begin_movement)
     {
-      std::cout << "begin" << std::endl;
+      model3 = glm::translate(model2, glm::vec3(-40.0f, 0.0f, 0.0f));
+      model3 = glm::rotate(model3, angle, glm::vec3(0.0f, 1.0f, 0.0f));
+      PlanetShader.setMat4("model", model3);
+      angle += 0.01f;
     }
 
+    earth.Draw(PlanetShader);
     // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved
     // etc.)
     // -------------------------------------------------------------------------------
@@ -207,7 +220,6 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
 {
   if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
   {
-    std::cout << "You pressed space" << std::endl;
     begin_movement = !begin_movement;
   }
 }
