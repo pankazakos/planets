@@ -120,22 +120,25 @@ int main()
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // black background
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // render
-
     // view/projection transformations
     glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
     glm::mat4 view = camera.GetViewMatrix();
-    PlanetShader.setMat4("projection", projection);
-    PlanetShader.setMat4("view", view);
 
-    LightingShader.setMat4("projection", projection);
-    LightingShader.setMat4("view", view);
-
-    // render the loaded models
-
-    // Sun
+    // First render light source (Sun)
     glm::mat4 model1 = glm::mat4(1.0f);
     model1 = glm::translate(model1, sun_pos);
+
+    LightingShader.use();
+    LightingShader.setMat4("projection", projection);
+    LightingShader.setMat4("view", view);
+    LightingShader.setMat4("model", model1);
+    LightingShader.setVec4("color", glm::vec4(1.8f, 1.5f, 1.0f, 1.0f));
+    sun.Draw(LightingShader);
+
+    // Render Earth and moon
+    PlanetShader.use();
+    PlanetShader.setMat4("projection", projection);
+    PlanetShader.setMat4("view", view);
 
     // Moon
     glm::mat4 model2 = glm::mat4(1.0f);
@@ -161,16 +164,10 @@ int main()
     model2 = glm::translate(model3, moon_pos);
 
     // Draw objects after all transformations
-    LightingShader.setMat4("model", model1);
-    LightingShader.setVec4("color", glm::vec4(1.8f, 1.5f, 1.0f, 1.0f));
-    sun.Draw(LightingShader);
-
     PlanetShader.setMat4("model", model2);
-    PlanetShader.setVec4("color", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
     moon.Draw(PlanetShader);
 
     PlanetShader.setMat4("model", model3);
-    PlanetShader.setVec4("color", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
     earth.Draw(PlanetShader);
 
     // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved
