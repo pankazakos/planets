@@ -28,6 +28,9 @@ bool firstMouse = true;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
+// time to increase angle accordingly
+float threshTime = 0.0f;
+
 // control space key
 bool begin_movement = false;
 
@@ -117,7 +120,7 @@ int main()
 
     // render
     // ------
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // black background
+    glClearColor(0.01f, 0.01f, 0.01f, 1.0f); // black background
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // view/projection transformations
@@ -151,7 +154,12 @@ int main()
     // Control movement
     if (begin_movement)
     {
-      angle += 0.001f;
+      threshTime += deltaTime;
+      if (threshTime >= 1.0 / 65)
+      {
+        angle += 0.001f;
+        threshTime = 0;
+      }
       earth_pos = glm::vec3(30.0f * glm::cos(5 * angle), 0.0f, -30.0f * glm::sin(5 * angle));
       moon_pos = glm::vec3(20.0f * glm::cos(angle), 0.0f, -20.0f * -glm::sin(angle));
     }
@@ -167,9 +175,11 @@ int main()
 
     // Draw objects after all transformations
     PlanetShader.setMat4("model", model2);
+    PlanetShader.setMat4("InvTransModel", glm::transpose(glm::inverse(model2)));
     moon.Draw(PlanetShader);
 
     PlanetShader.setMat4("model", model3);
+    PlanetShader.setMat4("InvTransModel", glm::transpose(glm::inverse(model3)));
     earth.Draw(PlanetShader);
 
     // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved

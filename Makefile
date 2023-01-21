@@ -1,4 +1,4 @@
-LIBS = -lGL -lGLU -lglfw -lXrandr -lXxf86vm -lXi -lXinerama -lX11 -lrt -ldl -lassimp
+LIBS = -lGL -lGLU -lglfw -lXrandr -lX11 -lrt -ldl -lassimp
 GLAD = /usr/include/glad/glad.c
 BIN = ./bin
 INCLUDE = ./include
