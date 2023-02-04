@@ -94,7 +94,7 @@ int main()
   Model earth("/home/pank/Documents/7o_eks/graphics/erg/dev/misc/earth/Model/Globe.obj");
 
   // Initial positions of planets based on camera
-  glm::vec3 sun_init_pos = glm::vec3(-8.0f, 0.0f, -60.0f);
+  glm::vec3 sun_init_pos = glm::vec3(0.0f, 0.0f, -60.0f);
   glm::vec3 moon_init_pos = glm::vec3(20.0f, 0.0f, 0.0f);
   glm::vec3 earth_init_pos = glm::vec3(30.0f, 0.0f, 0.0f);
 
@@ -144,6 +144,7 @@ int main()
     PlanetShader.setMat4("view", view);
     PlanetShader.setVec3("lightPos", sun_init_pos);
     PlanetShader.setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+    PlanetShader.setVec3("viewPos", camera.Position);
 
     // Moon
     glm::mat4 model2 = glm::mat4(1.0f);
