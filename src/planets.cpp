@@ -2,6 +2,9 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <iostream>
+#include <unistd.h>
+#include <stdlib.h>
+#include <limits.h>
 #include "shader.h"
 #include "camera.h"
 #include "model.h"
@@ -14,6 +17,7 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos);
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);
 void processInput(GLFWwindow *window);
+
 // settings
 const unsigned int SCR_WIDTH = 1280;
 const unsigned int SCR_HEIGHT = 720;
@@ -26,12 +30,9 @@ bool firstMouse = true;
 
 // timing
 float deltaTime = 0.0f;
-float lastFrame = 0.0f;
+float lastFrameTime = 0.0f;
 
-// time to increase angle accordingly
-float threshTime = 0.0f;
-
-// control space key
+// control movement with space key
 bool begin_movement = false;
 
 int main()
@@ -69,35 +70,50 @@ int main()
     return -1;
   }
 
-  // tell stb_image.h to flip loaded texture's on the y-axis (before loading model).
-  // stbi_set_flip_vertically_on_load(true);
-
   // configure global opengl state
   // -----------------------------
   glEnable(GL_DEPTH_TEST);
 
-  // Vertex shader
-  Shader PlanetShader("/home/pank/Documents/7o_eks/graphics/erg/dev/src/planets.vs",
-                      "/home/pank/Documents/7o_eks/graphics/erg/dev/src/planets.fs");
+  // Get path of current working directory (c-like code because there is no alternative in c++11)
+  char cwd[PATH_MAX];
+  if (getcwd(cwd, sizeof(cwd)) == NULL)
+  {
+    std::cerr << "getcwd() error" << std::endl;
+    return 1;
+  }
 
-  Shader LightingShader("/home/pank/Documents/7o_eks/graphics/erg/dev/src/planets.vs",
-                        "/home/pank/Documents/7o_eks/graphics/erg/dev/src/lighting.fs");
+  char vs_path[PATH_MAX];
+  strcpy(vs_path, cwd);
+  char fs_path[PATH_MAX];
+  strcpy(fs_path, cwd);
+
+  // Shaders
+  Shader PlanetShader(strcat(vs_path, "/src/planets.vs"),
+                      strcat(fs_path, "/src/planets.fs"));
+  strcpy(fs_path, cwd);
+  Shader LightingShader(vs_path,
+                        strcat(fs_path, "/src/lighting.fs"));
 
   PlanetShader.use();
   PlanetShader.setInt("texture0", 0);
-
   LightingShader.use();
   LightingShader.setInt("texture1", 1);
 
-  Model sun("/home/pank/Documents/7o_eks/graphics/erg/dev/misc/planet/planet.obj");
-  Model moon("/home/pank/Documents/7o_eks/graphics/erg/dev/misc/rock/rock.obj");
-  Model earth("/home/pank/Documents/7o_eks/graphics/erg/dev/misc/earth/Model/Globe.obj");
+  // Models
+  char model_path[PATH_MAX];
+  strcpy(model_path, cwd);
+  Model sun(strcat(model_path, "/misc/planet/planet.obj"));
+  strcpy(model_path, cwd);
+  Model moon(strcat(model_path, "/misc/rock/rock.obj"));
+  strcpy(model_path, cwd);
+  Model earth(strcat(model_path, "/misc/earth/Model/Globe.obj"));
 
   // Initial positions of planets based on camera
   glm::vec3 sun_init_pos = glm::vec3(0.0f, 0.0f, -60.0f);
   glm::vec3 moon_init_pos = glm::vec3(20.0f, 0.0f, 0.0f);
   glm::vec3 earth_init_pos = glm::vec3(30.0f, 0.0f, 0.0f);
 
+  // Current positions of planets
   glm::vec3 sun_pos = sun_init_pos;
   glm::vec3 moon_pos = moon_init_pos;
   glm::vec3 earth_pos = earth_init_pos;
@@ -110,9 +126,9 @@ int main()
   {
     // per-frame time logic
     // --------------------
-    float currentFrame = static_cast<float>(glfwGetTime());
-    deltaTime = currentFrame - lastFrame;
-    lastFrame = currentFrame;
+    float currentFrameTime = static_cast<float>(glfwGetTime());
+    deltaTime = currentFrameTime - lastFrameTime;
+    lastFrameTime = currentFrameTime;
 
     // input
     // -----
@@ -120,14 +136,14 @@ int main()
 
     // render
     // ------
-    glClearColor(0.01f, 0.01f, 0.01f, 1.0f); // black background
+    glClearColor(0.01f, 0.01f, 0.01f, 1.0f); // black backround with minimal ambient lighting (0.01f)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // view/projection transformations
     glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
     glm::mat4 view = camera.GetViewMatrix();
 
-    // First render light source (Sun)
+    // Render light source (Sun)
     glm::mat4 model1 = glm::mat4(1.0f);
     model1 = glm::translate(model1, sun_pos);
 
@@ -136,7 +152,7 @@ int main()
     LightingShader.setMat4("view", view);
     LightingShader.setMat4("model", model1);
     LightingShader.setVec4("color", glm::vec4(1.8f, 1.5f, 1.0f, 1.0f));
-    sun.Draw(LightingShader);
+    sun.Draw(LightingShader); // Draw object
 
     // Render Earth and moon
     PlanetShader.use();
@@ -155,12 +171,8 @@ int main()
     // Control movement
     if (begin_movement)
     {
-      threshTime += deltaTime;
-      if (threshTime >= 1.0 / 65)
-      {
-        angle += 0.001f;
-        threshTime = 0;
-      }
+      // Angle is increased based on time instead of frame
+      angle += deltaTime / 20;
       earth_pos = glm::vec3(30.0f * glm::cos(5 * angle), 0.0f, -30.0f * glm::sin(5 * angle));
       moon_pos = glm::vec3(20.0f * glm::cos(angle), 0.0f, -20.0f * -glm::sin(angle));
     }
@@ -248,7 +260,7 @@ void scroll_callback(GLFWwindow *window, double xoffset, double yoffset)
   camera.ProcessMouseScroll(static_cast<float>(yoffset));
 }
 
-// glfw: whenever a key is pressed, this callback is called to control the spcae key activation
+// glfw: whenever a key is pressed, this callback is called to control the space key activation
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
   if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
