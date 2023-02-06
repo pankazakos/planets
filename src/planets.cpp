@@ -174,7 +174,7 @@ int main()
       // Angle is increased based on time instead of frame
       angle += deltaTime / 20;
       earth_pos = glm::vec3(30.0f * glm::cos(5 * angle), 0.0f, -30.0f * glm::sin(5 * angle));
-      moon_pos = glm::vec3(20.0f * glm::cos(angle), 0.0f, -20.0f * -glm::sin(angle));
+      moon_pos = glm::vec3(20.0f * glm::cos(angle), 0.0f, -20.0f * glm::sin(angle));
     }
 
     // Earth positioning
