@@ -5,7 +5,9 @@ This is an OpenGL app that renders Sun, Earth and Moon objects in a 3d scene. Th
 
 
 ### Install dependencies (on ubuntu 22.04)
-```sudo apt install freeglut3-dev libglfw3 libglfw3 libglfw3-dev libglm-dev libassimp-dev assimp-utils libassimp-dev```
+```
+sudo apt install freeglut3-dev libglfw3 libglfw3 libglfw3-dev libglm-dev libassimp-dev assimp-utils libassimp-dev
+```
 
 
 
