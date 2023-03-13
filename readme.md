@@ -9,6 +9,12 @@ This is an OpenGL app that renders Sun, Earth and Moon objects in a 3d scene. Th
 sudo apt install freeglut3-dev libglfw3 libglfw3 libglfw3-dev libglm-dev libassimp-dev assimp-utils libassimp-dev
 ```
 
+### Glad configuration
+Unzip Glad.zip in ./include directory
+```
+unzip ./include/Glad.zip -d ./include/
+```
+
 
 
 ### compile and execute

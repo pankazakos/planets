@@ -5,12 +5,12 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <limits.h>
-#include "shader.h"
-#include "camera.h"
-#include "model.h"
+#include "shader.hpp"
+#include "camera.hpp"
+#include "model.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
+#include "stb_image.hpp"
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void mouse_callback(GLFWwindow *window, double xpos, double ypos);
