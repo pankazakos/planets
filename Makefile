@@ -15,7 +15,7 @@ OBJS = $(BUILD)/planets.o $(BUILD)/glad.o
 .PHONY: clean
 
 all: $(OBJS)
-	$(CXX) $(BUILD)/planets.o $(BUILD)/glad.o -I $(INCLUDE) $(LIBS) -o $(BIN)/planets $(FLAGS)
+	$(CXX) $(BUILD)/planets.o $(BUILD)/glad.o -I $(INCLUDE) $(LIBS) -o $(BIN)/planets
 
 run: all
 	$(BIN)/$(NAME)
@@ -24,7 +24,7 @@ clean:
 	rm -f $(BIN)/* $(BUILD)/*
 
 $(BUILD)/planets.o: $(SRC)/planets.cpp
-	$(CXX) $(SRC)/planets.cpp -c -I $(INCLUDE) -o $(BUILD)/planets.o
+	$(CXX) $(SRC)/planets.cpp -c -I $(INCLUDE) -o $(BUILD)/planets.o  $(FLAGS)
 
 $(BUILD)/glad.o: $(GLAD)
-	$(CXX) $(GLAD) -c -I $(INCLUDE) -o $(BUILD)/glad.o
+	$(CXX) $(GLAD) -c -I $(INCLUDE) -o $(BUILD)/glad.o  $(FLAGS)
