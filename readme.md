@@ -18,9 +18,17 @@ unzip ./include/Glad.zip -d ./include/
 
 
 ### compile and execute
-`make run`
+```
+make run
+```
 
 Alternatively, run the task from vscode
+
+### Usage
+W,A,S,D keys: movement in 3D scene.
+mouse: camera movement in 3D scene.
+scroll: zoom in and out.
+Space key: toggle movement of Earth and Moon.
 
 ### LearnOpenGL
 Credits to Joey de Vries from [LearnOpenGL](https://learnopengl.com/) for his great tutorial on OpenGL and providing the header files.
